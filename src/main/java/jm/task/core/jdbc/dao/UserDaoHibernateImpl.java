@@ -1,28 +1,26 @@
 package jm.task.core.jdbc.dao;
 
-import com.mysql.cj.Query;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.sql.Select;
 
-
-import java.sql.SQLException;
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
     private static Transaction transaction = null;
+
     public UserDaoHibernateImpl() {
 
     }
+
     @Override
     public void createUsersTable() {
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.createSQLQuery("CREATE TABLE IF NOT EXISTS users" +
-                    "(id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, name VARCHAR(45), lastname VARCHAR(45), age INT)").executeUpdate();
+            session.createSQLQuery("CREATE TABLE IF NOT EXISTS users" + "(id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, name VARCHAR(45), lastname VARCHAR(45), age INT)").executeUpdate();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -61,6 +59,7 @@ public class UserDaoHibernateImpl implements UserDao {
             System.out.println("Во время сохранения возникло исключение: " + e);
         }
     }
+
     @Override
     public void removeUserById(long id) {
         try (Session session = Util.getSessionFactory().openSession()) {
@@ -78,18 +77,14 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        List<User> listUser = new ArrayList<>();
+        List<User> list = new ArrayList<>();
         try (Session session = Util.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            listUser = session.createQuery("FROM User").getResultList();
-            transaction.commit();
+            TypedQuery<User> query = session.createQuery("from User", User.class);
+            list = query.getResultList();
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             System.out.println("Во время выводы таблицы возникло исключение: " + e);
         }
-        return listUser;
+        return list;
     }
 
     @Override
