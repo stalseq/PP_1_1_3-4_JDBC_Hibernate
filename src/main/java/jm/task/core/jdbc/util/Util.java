@@ -18,6 +18,7 @@ public class Util {
     private final static String user = "root";
     private final static String password = "root";
     private static Connection connection = null;
+
     public static Connection getConnection() throws SQLException {
         try {
             Class.forName(DB_SQL);
@@ -27,6 +28,7 @@ public class Util {
         }
         return connection;
     }
+
     private static SessionFactory sessionFactory;
 
     public static SessionFactory getSessionFactory() {
